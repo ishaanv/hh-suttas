@@ -1,8 +1,4 @@
-import {
-  scrollToHash,
-  showNotification,
-  changeAcronymNumber,
-} from "./js/utils.js";
+import { scrollToHash, showNotification, changeAcronymNumber } from "./js/utils.js";
 const suttaArea = document.getElementById("sutta");
 const homeButton = document.getElementById("home-button");
 const themeButton = document.getElementById("theme-button");
@@ -71,9 +67,7 @@ function displaySuttas(suttas, isSearch = false) {
       const title = sutta_details["title"];
       const heading = sutta_details["heading"] || "";
       const link = `<a href="/?q=${id.toLowerCase()}">${id}: ${title}`;
-      const em = heading
-        ? `<span style="color: #7f6e0a;">${heading}</span>`
-        : "";
+      const em = heading ? `<span style="color: #7f6e0a;">${heading}</span>` : "";
       const nikaya = sutta_id.slice(0, 2).toLowerCase();
 
       // Check if the current sutta belongs to a new group
@@ -84,9 +78,7 @@ function displaySuttas(suttas, isSearch = false) {
         currentGroup += 1;
         const key = Object.keys(books)[currentGroup];
 
-        return `<h2>${books[key]}</h2><li>${link}${
-          em ? ` (${em})` : ""
-        }</a></li>`;
+        return `<h2>${books[key]}</h2><li>${link}${em ? ` (${em})` : ""}</a></li>`;
       } else {
         return `<li>${link}${em ? ` (${em})` : ""}</a></li>`;
       }
@@ -118,10 +110,7 @@ function toggleThePali() {
     }
     setTimeout(() => {
       const currentScrollPosition = window.scrollY;
-      window.scrollTo(
-        0,
-        currentScrollPosition - (previousScrollPosition - currentScrollPosition)
-      );
+      window.scrollTo(0, currentScrollPosition - (previousScrollPosition - currentScrollPosition));
     }, 0);
   });
 }
@@ -138,14 +127,10 @@ function addNavbar() {
 
   window.addEventListener("scroll", () => {
     requestAnimationFrame(() => {
-      let currentScrollTop =
-        window.scrollY || document.documentElement.scrollTop;
+      let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
 
       if (Math.abs(currentScrollTop - lastScrollTop) > scrollThreshold) {
-        navbar.style.top =
-          currentScrollTop < 170 || currentScrollTop > lastScrollTop
-            ? "-50px"
-            : "0";
+        navbar.style.top = currentScrollTop < 170 || currentScrollTop > lastScrollTop ? "-50px" : "0";
         lastScrollTop = currentScrollTop;
       }
     });
@@ -154,29 +139,23 @@ function addNavbar() {
 
 async function createFuseSearch() {
   //Combine all values in a single field so user can do search on multiple fields
-  let searchDict = Object.entries(availableSuttasJson).map(
-    ([sutta_id, sutta_details]) => {
-      // Declare search fields here
-      let sutta_details_without_fp = (({ id, title, pali_title }) => ({
-        id,
-        title,
-        pali_title,
-      }))(sutta_details);
+  let searchDict = Object.entries(availableSuttasJson).map(([sutta_id, sutta_details]) => {
+    // Declare search fields here
+    let sutta_details_without_fp = (({ id, title, pali_title }) => ({ id, title, pali_title }))(sutta_details);
 
-      sutta_details_without_fp["citation"] = sutta_id;
-      // Get every element's values and combine them with a white space
-      const combination = Object.values(sutta_details_without_fp)
-        .join(" ")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, ""); //pali normalized in latin for search to work on headings containing pali
+    sutta_details_without_fp["citation"] = sutta_id;
+    // Get every element's values and combine them with a white space
+    const combination = Object.values(sutta_details_without_fp)
+      .join(" ")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, ""); //pali normalized in latin for search to work on headings containing pali
 
-      // Return new object with "combination" key added
-      return {
-        ...sutta_details_without_fp,
-        combination: combination,
-      };
-    }
-  );
+    // Return new object with "combination" key added
+    return {
+      ...sutta_details_without_fp,
+      combination: combination,
+    };
+  });
 
   fuse = new Fuse(searchDict, fuseOptions);
   return fuse;
@@ -197,15 +176,9 @@ function buildSutta(slug) {
   // TODO if file names are consistent we can get it from the availablesuttasjson
   let sutta_title = sutta_details["title"];
 
-  const rootResponse = fetch(sutta_details["root_path"]).then((response) =>
-    response.json()
-  );
-  const translationResponse = fetch(sutta_details["translation_path"]).then(
-    (response) => response.json()
-  );
-  const htmlResponse = fetch(sutta_details["html_path"]).then((response) =>
-    response.json()
-  );
+  const rootResponse = fetch(sutta_details["root_path"]).then((response) => response.json());
+  const translationResponse = fetch(sutta_details["translation_path"]).then((response) => response.json());
+  const htmlResponse = fetch(sutta_details["html_path"]).then((response) => response.json());
   const commentResponse = fetch(sutta_details["comment_path"])
     .then((response) => {
       if (!response.ok) throw new Error(`Comment file not found for ${slug}`);
@@ -219,21 +192,9 @@ function buildSutta(slug) {
   const authors = fetch(`authors.json`).then((response) => response.json());
 
   // Get root, translation and html jsons from folder
-  Promise.all([
-    htmlResponse,
-    rootResponse,
-    translationResponse,
-    commentResponse,
-    authors,
-  ])
+  Promise.all([htmlResponse, rootResponse, translationResponse, commentResponse, authors])
     .then((responses) => {
-      const [
-        html_text,
-        root_text,
-        translation_text,
-        comment_text,
-        authors_text,
-      ] = responses;
+      const [html_text, root_text, translation_text, comment_text, authors_text] = responses;
       const keys_order = Object.keys(html_text);
       keys_order.forEach((segment) => {
         if (translation_text[segment] === undefined) {
@@ -243,23 +204,16 @@ function buildSutta(slug) {
         // openHtml = openHtml.replace(/^<span class='verse-line'>/, "<br><span class='verse-line'>");
 
         if (window.addBreaks === true) {
-          openHtml = openHtml.replace(
-            /^<span class='verse-line'>/,
-            "<br><span class='verse-line'>"
-          );
+          openHtml = openHtml.replace(/^<span class='verse-line'>/, "<br><span class='verse-line'>");
         }
 
         if (openHtml.includes("sutta-title")) {
-          sutta_title = `${root_text[segment] || ""} : ${
-            translation_text[segment]
-          }`;
+          sutta_title = `${root_text[segment] || ""} : ${translation_text[segment]}`;
         }
 
         html +=
           `${openHtml}<span class="segment" id="${segment}">` +
-          `<span class="pli-lang" lang="pi">${
-            root_text[segment] || ""
-          }</span>` +
+          `<span class="pli-lang" lang="pi">${root_text[segment] || ""}</span>` +
           `<span class="eng-lang" lang="en">${translation_text[segment]}` +
           `${
             comment_text[segment]
@@ -287,10 +241,7 @@ function buildSutta(slug) {
         // Event listeners for showing/hiding the tooltip
         element.addEventListener("click", (event) => {
           event.stopPropagation();
-          if (
-            currentlyOpenTooltip &&
-            currentlyOpenTooltip !== commentTextSpan
-          ) {
+          if (currentlyOpenTooltip && currentlyOpenTooltip !== commentTextSpan) {
             currentlyOpenTooltip.style.display = "none"; // Hide the previously shown tooltip
           }
           commentTextSpan.style.display = "block";
@@ -320,9 +271,7 @@ function buildSutta(slug) {
       scrollToHash();
     })
     .catch((error) => {
-      suttaArea.innerHTML = `<p>Sorry, "${decodeURIComponent(
-        slug
-      )}" is not a valid sutta citation.
+      suttaArea.innerHTML = `<p>Sorry, "${decodeURIComponent(slug)}" is not a valid sutta citation.
 
     <br><br>Note: Make sure the citation code is correct. Otherwise try finding the sutta from the home page.<br>`;
     });
@@ -353,23 +302,16 @@ themeButton.addEventListener("click", () => {
   const currentThemeIsDark = localStorage.theme === "dark";
   toggleTheme(!currentThemeIsDark);
 });
+
 let fuse = null;
 fuse = await createFuseSearch(); // holds our search engine
 
 const citation = document.getElementById("citation");
 citation.focus();
 
-citation.value = document.location.search
-  .replace("?q=", "")
-  .replace(/%20/g, "")
-  .replace(/\s/g, "");
+citation.value = document.location.search.replace("?q=", "").replace(/%20/g, "").replace(/\s/g, "");
 if (document.location.search) {
-  buildSutta(
-    document.location.search
-      .replace("?q=", "")
-      .replace(/\s/g, "")
-      .replace(/%20/g, "")
-  );
+  buildSutta(document.location.search.replace("?q=", "").replace(/\s/g, "").replace(/%20/g, ""));
 } else {
   displaySuttas(availableSuttasJson);
 }
@@ -394,9 +336,7 @@ document.getElementById("cacheButton").addEventListener("click", () => {
     // Send message to service worker to trigger caching
     try {
       showNotification("Downloading...");
-      navigator.serviceWorker.controller.postMessage({
-        action: "cacheResources",
-      });
+      navigator.serviceWorker.controller.postMessage({ action: "cacheResources" });
     } catch (error) {
       console.log(error);
       // TODO maybe a red colour box here?
@@ -429,10 +369,7 @@ document.addEventListener("click", function (event) {
   let notificationBox = document.querySelector(".info-notification-box");
   if (notificationBox && notificationBox.style.display == "block") {
     // Check if the click is outside the notificationBox and not on the infoButton
-    if (
-      !notificationBox.contains(event.target) &&
-      event.target !== infoButton
-    ) {
+    if (!notificationBox.contains(event.target) && event.target !== infoButton) {
       notificationBox.style.display = "none";
     }
   }
@@ -444,9 +381,7 @@ navigator.serviceWorker.addEventListener("message", (event) => {
   }
   if (event.data && event.data.action === "cachingError") {
     // TODO again maybe a different colour box
-    showNotification(
-      "Caching error. Please clear site data, refresh the page, and try again."
-    );
+    showNotification("Caching error. Please clear site data, refresh the page, and try again.");
   }
 });
 
@@ -468,9 +403,7 @@ citation.addEventListener("input", (e) => {
 
 // Toggle side-by-side mode
 document.onkeyup = function (e) {
-  const paliHidden = document
-    .getElementById("sutta")
-    .classList.contains("hide-pali");
+  const paliHidden = document.getElementById("sutta").classList.contains("hide-pali");
   if (!paliHidden && e.target.id != "citation" && e.key == "s") {
     if (localStorage.sideBySide === "true") {
       bodyTag.classList.remove("side-by-side");
@@ -488,10 +421,7 @@ homeButton.addEventListener("click", () => {
 
 document.getElementById("form").addEventListener("submit", (e) => {
   e.preventDefault();
-  const citationValue = document
-    .getElementById("citation")
-    .value.trim()
-    .replace(/\s/g, "");
+  const citationValue = document.getElementById("citation").value.trim().replace(/\s/g, "");
   if (citationValue) {
     buildSutta(citationValue);
     history.pushState({ page: citationValue }, "", `?q=${citationValue}`);
