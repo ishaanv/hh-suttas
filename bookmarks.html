@@ -97,7 +97,18 @@
             </svg>
         </div>
     </form>
-    <div id="bookmarks">
+    <div id="bookmarksArea">
+        <input type="text" placeholder="Enter new label" id="newLabelInput">
+        <button id="saveLabelButton">Save Label</button>
+        <button id="downloadButton">Download Bookmarks</button>
+        <button id="uploadButton">Upload Bookmarks</button>
+        <input type="file" id="fileInput" accept="application/json" style="display: none;">
+        <button id="authorize_button">Authorize</button>
+        <button id="signout_button">Sign Out</button>
+        <button id="create_file_button">Create or Update File</button>
+        <button id="read_file_button">Read File</button>
+        <div id="bookmarks">
+        </div>
     </div>
     <hr>
     <div id="navigation" class="navigation">
@@ -107,8 +118,11 @@
     <div id="footer">
         <a href="https://hillsidehermitage.org">Hillside Hermitage Website</a>
     </div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
     <script type="module" src="index.js"></script>
     <script type="module" src="bookmarks.js"></script>
+    <script type="module" src="drive.js"></script>
 </body>
 
 </html>

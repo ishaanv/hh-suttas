@@ -5,6 +5,70 @@ const response = await fetch('available_suttas.json');
 const availableSuttas = await response.json();
 const availableSuttasJson = availableSuttas['available_suttas'];
 
+const labelInput = document.getElementById('newLabelInput');
+const saveLabelButton = document.getElementById('saveLabelButton');
+const downloadButton = document.getElementById('downloadButton');
+const uploadButton = document.getElementById('uploadButton');
+const fileInput = document.getElementById('fileInput');
+
+// Event listener for the save button
+saveLabelButton.addEventListener('click', () => {
+  const newLabel = labelInput.value.trim();
+  if (newLabel) {
+    let bookmarksData = JSON.parse(localStorage.getItem('bookmarksData')) || DEFAULT_BOOKMARK_DICT;
+    const bookmarksDict = bookmarksData.bookmarks;
+
+    if (!bookmarksDict[newLabel]) {
+      bookmarksDict[newLabel] = [];
+      bookmarksData['bookmarks'] = bookmarksDict;
+      localStorage.setItem('bookmarksData', JSON.stringify(bookmarksData));
+      showNotification(`Added new label: ${newLabel}`);
+      displayPage();
+    } else {
+      showNotification(`Label "${newLabel}" already exists`);
+    }
+
+    labelInput.value = '';
+  } else {
+    showNotification('Label cannot be empty');
+  }
+});
+
+// Event listener for the download button
+downloadButton.addEventListener('click', () => {
+  const bookmarksData = localStorage.getItem('bookmarksData');
+  const blob = new Blob([bookmarksData], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bookmarksData.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// Event listener for the upload button
+uploadButton.addEventListener('click', () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const bookmarksData = JSON.parse(e.target.result);
+        localStorage.setItem('bookmarksData', JSON.stringify(bookmarksData));
+        showNotification('Bookmarks uploaded successfully');
+        displayPage();
+      } catch (error) {
+        showNotification('Failed to upload bookmarks: Invalid JSON');
+      }
+    };
+    reader.readAsText(file);
+  }
+});
+
 function getRangeAsString(jsonObj, startKey, endKey) {
   let startKeyReached = false;
   let resultString = '';
@@ -17,6 +81,7 @@ function getRangeAsString(jsonObj, startKey, endKey) {
 
   return resultString;
 }
+
 async function displayBookmarks() {
   // Retrieve bookmarks from localStorage
   let bookmarksData = JSON.parse(localStorage.getItem('bookmarksData'));
@@ -224,91 +289,8 @@ function displayPage() {
   const bookmarksDiv = document.getElementById('bookmarks');
 
   bookmarksDiv.innerHTML = '';
-
-  const labelInput = document.createElement('input');
-  labelInput.type = 'text';
-  labelInput.placeholder = 'Enter new label';
-  labelInput.id = 'newLabelInput';
-  bookmarksDiv.appendChild(labelInput);
-
-  const saveLabelButton = document.createElement('button');
-  saveLabelButton.textContent = 'Save Label';
-  bookmarksDiv.appendChild(saveLabelButton);
-
-  // Event listener for the save button
-  saveLabelButton.addEventListener('click', () => {
-    const newLabel = labelInput.value.trim();
-    if (newLabel) {
-      let bookmarksData = JSON.parse(localStorage.getItem('bookmarksData')) || DEFAULT_BOOKMARK_DICT;
-      const bookmarksDict = bookmarksData.bookmarks;
-
-      if (!bookmarksDict[newLabel]) {
-        bookmarksDict[newLabel] = [];
-        bookmarksData['bookmarks'] = bookmarksDict;
-        localStorage.setItem('bookmarksData', JSON.stringify(bookmarksData));
-        showNotification(`Added new label: ${newLabel}`);
-        displayPage();
-      } else {
-        showNotification(`Label "${newLabel}" already exists`);
-      }
-
-      labelInput.value = '';
-    } else {
-      showNotification('Label cannot be empty');
-    }
-  });
-
-  // Create download button
-  const downloadButton = document.createElement('button');
-  downloadButton.textContent = 'Download Bookmarks';
-  bookmarksDiv.appendChild(downloadButton);
-
-  downloadButton.addEventListener('click', () => {
-    const bookmarksData = localStorage.getItem('bookmarksData');
-    const blob = new Blob([bookmarksData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'bookmarksData.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // Create upload button
-  const uploadButton = document.createElement('button');
-  uploadButton.textContent = 'Upload Bookmarks';
-  bookmarksDiv.appendChild(uploadButton);
-
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = 'application/json';
-  fileInput.style.display = 'none';
-  bookmarksDiv.appendChild(fileInput);
-
-  uploadButton.addEventListener('click', () => {
-    fileInput.click();
-  });
-
-  fileInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const bookmarksData = JSON.parse(e.target.result);
-          localStorage.setItem('bookmarksData', JSON.stringify(bookmarksData));
-          showNotification('Bookmarks uploaded successfully');
-          displayPage();
-        } catch (error) {
-          showNotification('Failed to upload bookmarks: Invalid JSON');
-        }
-      };
-      reader.readAsText(file);
-    }
-  });
-
-  // Call the function to display bookmarks
   displayBookmarks();
 }
+export { displayPage };
 
 displayPage();
